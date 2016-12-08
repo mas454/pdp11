@@ -28,6 +28,9 @@
 	(#x15c0 (format t "~4,'0x ~4,'0x mov $~x, r0~%"
 			(read16 mem i) (read16 mem (+ i 2)) (read16 mem (+ i 2)))
 	        (incf i 4))
+
+	(#x8901 (format t "~4,'0x sys 1 ; exit~%" (read16 mem i))
+	        (incf i 2))
 	
         (#x8904 (format t "~4,'0x sys 4 ; write~%" (read16 mem i))
 	        (incf i 2)
@@ -35,6 +38,9 @@
 		(incf i 2)
 		(format t "~4,'0x: ~4,'0x ; arg~%" i (read16 mem i))
 		(incf i 2))
+
+	(t (format t "~4,'0x ???~%" (read16 mem i))
+	   (incf i 2))
 	)
       )))
 
