@@ -1,3 +1,8 @@
+(defmacro while (test &body body)
+  `(do ()
+     ((not ,test))
+     ,@body))
+
 (defun load-memory (path)
   (with-open-file (s path :element-type '(unsigned-byte 8))
     (let ((mem (make-array (file-length s) :element-type '(unsigned-byte 8))))
@@ -21,7 +26,7 @@
       (format t "~4,'0x: " i)
       (case (read16 mem i)
 	(#x15c0 (format t "~4,'0x ~4,'0x mov $~x, r0"
-			(read16 mem i) (read16 mem (+ i 4)) (read16 mem (+ i 4)))
+			(read16 mem i) (read16 mem (+ i 2)) (read16 mem (+ i 2)))
 	        (incf i 4))
 	
         (#x8904 (format t "~4,'0x sys 4 ; write" (read16 mem i))
