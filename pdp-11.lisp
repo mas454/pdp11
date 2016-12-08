@@ -25,14 +25,19 @@
     (while (< i (length mem))
       (format t "~4,'0x: " i)
       (case (read16 mem i)
-	(#x15c0 (format t "~4,'0x ~4,'0x mov $~x, r0"
+	(#x15c0 (format t "~4,'0x ~4,'0x mov $~x, r0~%"
 			(read16 mem i) (read16 mem (+ i 2)) (read16 mem (+ i 2)))
 	        (incf i 4))
 	
-        (#x8904 (format t "~4,'0x sys 4 ; write" (read16 mem i))
-	        (incf i 2))
+        (#x8904 (format t "~4,'0x sys 4 ; write~%" (read16 mem i))
+	        (incf i 2)
+		(format t "~4,'0x: ~4,'0x ; arg~%" i (read16 mem i))
+		(incf i 2)
+		(format t "~4,'0x: ~4,'0x ; arg~%" i (read16 mem i))
+		(incf i 2))
 	)
       )))
 
 ;(defvar *vec* (make-array 5 :fill-pointer 0 :adjustable t))
-(defparameter *testmem* (vector #xc0 #x15 #x01 #x00))
+(defparameter *testmem* (vector #xc0 #x15 #x01 #x00 
+				#x04 #x89 #x10 #x00 #x06 #x00 ))
