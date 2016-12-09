@@ -44,6 +44,12 @@
 	)
       )))
 
+(defun run-d (path)
+  (let* ((mem (load-memory path))
+	 (tsize (read16 mem 2))
+	 (dsize (read16 mem 4)))
+    (reasem (subseq mem 16 (+ 16 tsize) ))))
+
 ;(defvar *vec* (make-array 5 :fill-pointer 0 :adjustable t))
 (defparameter *testmem* (vector #xc0 #x15 #x01 #x00 
 				#x04 #x89 #x10 #x00 #x06 #x00 ))
