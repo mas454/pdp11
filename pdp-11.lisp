@@ -1,3 +1,6 @@
+(defparameter *r0* 0)
+(defparameter *pc* 0)
+
 (defmacro while (test &body body)
   `(do ()
      ((not ,test))
@@ -49,6 +52,14 @@
 	 (tsize (read16 mem 2))
 	 (dsize (read16 mem 4)))
     (reasem (subseq mem 16 (+ 16 tsize) ))))
+
+(defun mov-n-r0 (mem)
+  (setf *r0* (read16 mem (+ *pc* 2)))
+  (incf *pc* 4))
+
+(defun sys-exit (mem)
+  (setf *pc* -1))
+
 
 ;(defvar *vec* (make-array 5 :fill-pointer 0 :adjustable t))
 (defparameter *testmem* (vector #xc0 #x15 #x01 #x00 
