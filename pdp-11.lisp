@@ -77,8 +77,11 @@
 	     (#x15c0 (mov-n-r0 mem))
 	     (#x8901 (sys-exit mem))
 	     (#x8904 (sys-write mem))
+	     (t (format t "~4,'0x: ~4,'0x ???~%" *pc* (read16 mem *pc*))
+		(setf *pc* -1))
 	     )
 	   )))
+
 (defun run (path)
   (let* ((mem (load-memory path))
 	 (tsize (read16 mem 2))
