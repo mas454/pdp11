@@ -46,6 +46,48 @@
 	   (incf i 2))
 	)
       )))
+(defun dump-mov-n-rn (mem n)
+  (format t "~4,'0x ~4,'0x mov $~x, r~x~%"
+	(read16 mem *pc*) (read16 mem (+ *pc* 2)) (read16 mem (+ *pc* 2)) n)
+  (incf *pc* 4))
+
+(defun dump-mov-n-*rn (mem n)
+   (format t "~4,'0x ~4,'0x mov $~x, (r~x)~%"
+	   (read16 mem *pc*) (read16 mem (+ *pc* 2)) (read16 mem (+ *pc* 2)) n)
+   (incf *pc* 4))
+
+(defun dump-sys-exit (mem)
+  (format t "~4,'0x sys 1 ; exit~%" (read16 mem *pc*))
+  (incf *pc* 4))
+
+(defun dump-sys-write (mem)
+  (format t "~4,'0x sys 4 ; write~%" (read16 mem *pc*))
+  (incf *pc* 2)
+  (format t "~4,'0x: ~4,'0x ; arg~%" *pc* (read16 mem *pc*))
+  (incf *pc* 2)
+  (format t "~4,'0x: ~4,'0x ; arg~%" *pc* (read16 mem *pc*))
+  (incf *pc* 2))
+
+(defun reasem (mem)
+  (let ((*pc* 0))
+    (while (< *pc* (length mem))
+	    (format t "~4,'0x: " *pc*)
+	    (case (read16 mem *pc*)
+	      (#x15c0 (dump-mov-n-rn mem 0))
+	      (#x15c1 (dump-mov-n-rn mem 1))
+	      (#x15c9 (dump-mov-n-*rn mem 1))
+
+	      (#x8901 (dump-sys-exit mem))
+
+	      (#x8904 (dump-sys-write mem))
+
+	      (t (format t "~4,'0x ???~%" (read16 mem *pc*))
+	         (incf *pc* 2))
+	      )
+	    )))
+
+
+
 
 (defun run-d (path)
   (let* ((mem (load-memory path))
