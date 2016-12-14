@@ -61,6 +61,12 @@
 	   (read16 mem *pc*) (read16 mem (+ *pc* 2)) (read16 mem (+ *pc* 2)) n)
    (incf *pc* 4))
 
+(defun dump-mov-n-*r+n (mem n)
+  (format t "~4,'0x ~4,'0x ~4,'0x mov $~x, ~x(r~x)~%"
+	  (read16 mem *pc*) (read16 mem (+ *pc* 2)) (read16 mem (+ *pc* 4))
+	  (read16 mem (+ *pc* 2)) (read16 mem (+ *pc* 4)) n)
+  (incf *pc* 6))
+
 (defun dump-sys-exit (mem)
   (format t "~4,'0x sys 1 ; exit~%" (read16 mem *pc*))
   (incf *pc* 4))
@@ -81,6 +87,7 @@
 	      (#x15c0 (dump-mov-n-rn mem 0))
 	      (#x15c1 (dump-mov-n-rn mem 1))
 	      (#x15c9 (dump-mov-n-*rn mem 1))
+	      (#x15f1 (dump-mov-n-*r+n mem 1))
 
 	      (#x8901 (dump-sys-exit mem))
 
@@ -112,6 +119,10 @@
   (write16 mem *r1* (read16 mem (+ *pc* 2)))
   (incf *pc* 4))
 
+(defun mov-n-*r1+n (mem)
+  (write16 mem (+ *r1* (read16 mem (+ *pc* 4))) (read16 mem (+ *pc* 2)))
+  (incf *pc* 6))
+
 (defun sys-exit (mem)
   (setf *pc* -1))
 
@@ -132,6 +143,7 @@
 	     (#x15c0 (mov-n-r0 mem))
 	     (#x15c1 (mov-n-r1 mem))
 	     (#x15c9 (mov-n-*r1 mem))
+	     (#x15f1 (mov-n-*r1+n mem))
 	     (#x8901 (sys-exit mem))
 	     (#x8904 (sys-write mem))
 	     (t (format t "~4,'0x: ~4,'0x ???~%" *pc* (read16 mem *pc*))
