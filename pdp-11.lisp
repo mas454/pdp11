@@ -1,4 +1,5 @@
 (defparameter *r0* 0)
+(defparameter *r1* 0)
 (defparameter *pc* 0)
 
 (defmacro while (test &body body)
@@ -22,6 +23,10 @@
 
 (defun read16 (mem i)
   (logior (elt mem i) (ash (elt mem (+ i 1)) 8)))
+
+(defun write16 (mem r n)
+  (setf (elt mem r) (logand n #b0000000011111111))
+  (setf (elt mem (+ r 1)) (ash n -8)))
 
 (defun reasem (mem)
   (let ((i 0))
@@ -99,6 +104,14 @@
   (setf *r0* (read16 mem (+ *pc* 2)))
   (incf *pc* 4))
 
+(defun mov-n-r1 (mem)
+  (setf *r1* (read16 mem (+ *pc* 2)))
+  (incf *pc* 4))
+
+(defun mov-n-*r1 (mem)
+  (write16 mem *r1* (read16 mem (+ *pc* 2)))
+  (incf *pc* 4))
+
 (defun sys-exit (mem)
   (setf *pc* -1))
 
@@ -117,6 +130,8 @@
     (while (and (< *pc* tsize) (> *pc* -1))
 	   (case (read16 mem *pc*)
 	     (#x15c0 (mov-n-r0 mem))
+	     (#x15c1 (mov-n-r1 mem))
+	     (#x15c9 (mov-n-*r1 mem))
 	     (#x8901 (sys-exit mem))
 	     (#x8904 (sys-write mem))
 	     (t (format t "~4,'0x: ~4,'0x ???~%" *pc* (read16 mem *pc*))
